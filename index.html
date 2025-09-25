@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Input Holistik</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper/swiper-bundle.min.css"/>
+  <script src="https://cdn.jsdelivr.net/npm/swiper/swiper-bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <style>
+    /* Fade-in animation for the popup */
+    #popup {
+      opacity: 0;
+      transition: opacity 0.5s ease-in-out;
+    }
+    #popup.show {
+      opacity: 1;
+    }
+    /* Custom styles for the card */
+    .card-header {
+      background: var(--gradient);
+      color: white;
+      padding: 1rem;
+      border-top-left-radius: 1rem;
+      border-top-right-radius: 1rem;
+      text-align: center;
+      font-size: 1.5rem;
+      font-weight: bold;
+      border: 1px solid transparent; /* Transparent border */
+    }
+    .card-body {
+      background: white;
+      padding: 1rem;
+      border-bottom-left-radius: 1rem;
+      border-bottom-right-radius: 1rem;
+      border: 1px solid transparent; /* Transparent border */
+    }
+    .card-divider {
+      border: 0;
+      height: 2px;
+      background: var(--gradient);
+      margin: 0;
+    }
+    /* Transparent border and shadow for card container */
+    .card-container {
+      border: 1px solid transparent; /* Transparent border */
+      box-shadow: 0 0 0 transparent; /* Transparent shadow */
+    }
+    /* Style for fixed save button */
+    .save-btn {
+      display: block;
+      margin: 1rem auto; /* Centered with spacing */
+      background: #3b82f6; /* Blue-500, Telegram-like */
+      color: white;
+      padding: 0.75rem 2rem;
+      border-radius: 0.375rem; /* Sharper corners */
+      font-weight: 600;
+      transition: background 0.3s ease;
+      z-index: 1000; /* Ensure button is above other elements */
+      cursor: pointer;
+    }
+    .save-btn:hover {
+      background: #2563eb; /* Blue-600 */
+    }
+    /* Pagination styles */
+    .swiper-pagination {
+      position: relative; /* Relative to popup-container */
+      margin: 0.5rem auto; /* Center with spacing */
+      z-index: 1000; /* Ensure clickability */
+      padding: 0.5rem; /* Touch area */
+      width: fit-content; /* Fit content for centering */
+    }
+    .swiper-pagination-bullet {
+      width: 12px !important;
+      height: 12px !important;
+      background: #ffffff !important; /* White for visibility */
+      opacity: 0.7 !important;
+      margin: 0 6px !important; /* Spacing between dots */
+      transition: opacity 0.3s ease;
+    }
+    .swiper-pagination-bullet-active {
+      background: #7e22ce !important; /* Purple-700 for active */
+      opacity: 1 !important;
+    }
+    /* Popup container */
+    .popup-container {
+      position: relative;
+      max-width: 95%;
+      width: 100%;
+      margin: auto;
+      padding-bottom: 4rem; /* Space for pagination and button */
+    }
+    /* Transparent shadow for swiper */
+    .mySwiper {
+      box-shadow: 0 0 0 transparent !important;
+    }
+    /* Transparent border for swiper slide */
+    .swiper-slide {
+      border: 1px solid transparent !important;
+    }
+    /* Professional Telegram-themed form styles */
+    #bioForm {
+      background: #F7FAFC; /* Soft white with blue tint */
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+      border-radius: 0.5rem; /* Sharper corners */
+      padding: 1.5rem; /* Slightly more padding for header */
+    }
+    #bioForm .form-header {
+      color: #1A202C; /* Gray-900 */
+      font-size: 1.5rem;
+      font-weight: 600;
+      text-align: center;
+      margin-bottom: 1.25rem; /* Space below header */
+    }
+    #bioForm label {
+      color: #1A202C; /* Gray-900 for strong contrast */
+      font-weight: 500;
+      font-size: 0.95rem;
+      margin-bottom: 0.4rem;
+      display: block;
+    }
+    #bioForm input {
+      border: 1px solid #CBD5E0; /* Gray-300 for neutral border */
+      background: #ffffff;
+      border-radius: 0.375rem;
+      padding: 0.65rem 0.75rem;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+      font-size: 0.9rem;
+    }
+    #bioForm input:focus {
+      border-color: #40C4FF; /* Telegram blue */
+      box-shadow: 0 0 4px rgba(64, 196, 255, 0.2); /* Subtle blue glow */
+      outline: none;
+    }
+    #bioForm button[type="submit"] {
+      background: #40C4FF; /* Telegram blue */
+      color: white;
+      font-weight: 600;
+      padding: 0.65rem 1.25rem;
+      border-radius: 0.375rem;
+      border: none;
+      transition: background 0.2s ease;
+      width: 100%;
+    }
+    #bioForm button[type="submit"]:hover {
+      background: #0288D1; /* Darker Telegram blue */
+    }
+    /* Mobile-specific adjustments */
+    @media (max-width: 640px) {
+      #bioForm {
+        padding: 1rem;
+        max-width: 100%;
+      }
+      #bioForm .form-header {
+        font-size: 1.25rem; /* Smaller header on mobile */
+        margin-bottom: 1rem;
+      }
+      .card-header {
+        font-size: 1.2rem;
+      }
+      .card-body {
+        font-size: 0.9rem;
+      }
+      .swiper-button-prev,
+      .swiper-button-next {
+        display: none; /* Hide arrows on mobile */
+      }
+      .save-btn {
+        padding: 0.65rem 1.5rem;
+        font-size: 0.9rem;
+      }
+      .swiper-pagination {
+        margin: 0.5rem auto;
+      }
+      .popup-container {
+        padding-bottom: 3.5rem; /* Adjusted for mobile */
+      }
+    }
+  </style>
+</head>
+<body class="bg-gray-100 min-h-screen p-4">
+  <!-- FORM -->
+  <form id="bioForm" class="max-w-md mx-auto space-y-3">
+    <div class="form-header">Input Data Holistik</div>
+    <div>
+      <label class="block">Nama Lengkap</label>
+      <input type="text" name="namaLengkap" required class="w-full">
+    </div>
+    <div>
+      <label class="block">Nama Panggilan</label>
+      <input type="text" name="namaPanggilan" required class="w-full">
+    </div>
+    <div>
+      <label class="block">Alamat</label>
+      <input type="text" name="alamat" required class="w-full">
+    </div>
+    <div>
+      <label class="block">Nama Ayah</label>
+      <input type="text" name="namaAyah" required class="w-full">
+    </div>
+    <div>
+      <label class="block">Nama Ibu</label>
+      <input type="text" name="namaIbu" required class="w-full">
+    </div>
+    <div>
+      <label class="block">Hobi</label>
+      <input type="text" name="hobi" required class="w-full">
+    </div>
+    <div>
+      <label class="block">Alasan</label>
+      <input type="text" name="alasan" required class="w-full">
+    </div>
+    <div>
+      <label class="block">Cita-cita</label>
+      <input type="text" name="citaCita" required class="w-full">
+    </div>
+    <button type="submit" class="w-full">Simpan</button>
+  </form>
+
+  <!-- POPUP -->
+  <div id="popup" class="fixed inset-0 hidden bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
+    <div class="popup-container">
+      <div class="swiper mySwiper rounded-2xl overflow-hidden">
+        <div class="swiper-wrapper" id="templateContainer"></div>
+        <div class="swiper-button-prev text-white"></div>
+        <div class="swiper-button-next text-white"></div>
+      </div>
+      <div class="swiper-pagination"></div>
+      <button class="save-btn">Simpan PNG</button>
+    </div>
+  </div>
+
+  <script>
+    const templates = [
+      "Halo, nama saya [Nama Lengkap], panggil saja [Nama Panggilan]. Saya tinggal di [Alamat]. Ayah saya [Nama Ayah] dan ibu saya [Nama Ibu]. Hobi saya [Hobi] karena [Alasan]. Cita-cita saya adalah [Cita-cita]. Setiap hari saya bangun, mandi, sholat, sarapan, lalu pergi ke sekolah. Saya merasa senang bisa bercerita.",
+      "Perkenalkan, nama lengkap saya [Nama Lengkap], bisa dipanggil [Nama Panggilan]. Rumah saya di [Alamat]. Ayah saya bernama [Nama Ayah], ibu saya bernama [Nama Ibu]. Hobi saya [Hobi], karena [Alasan]. Saya ingin menjadi [Cita-cita]. Kegiatan saya setiap hari adalah bangun tidur, merapikan tempat tidur, mandi, sholat, sarapan, sekolah, lalu pulang. Saya merasa bahagia.",
+      "Halo teman-teman, nama saya [Nama Lengkap], biasa dipanggil [Nama Panggilan]. Saya tinggal di [Alamat]. Nama ayah saya [Nama Ayah] dan nama ibu saya [Nama Ibu]. Saya suka [Hobi] karena [Alasan]. Cita-cita saya [Cita-cita]. Setiap hari saya bangun, mandi, sholat, sarapan, pergi ke sekolah, belajar, dan pulang. Saya merasa gembira.",
+      "Selamat pagi, nama saya [Nama Lengkap]. Teman-teman bisa memanggil saya [Nama Panggilan]. Saya tinggal di [Alamat]. Ayah saya bernama [Nama Ayah] dan ibu saya [Nama Ibu]. Hobi saya adalah [Hobi], karena [Alasan]. Cita-cita saya menjadi [Cita-cita]. Rutinitas saya adalah bangun, mandi, sholat, sarapan, sekolah, lalu pulang. Saya merasa senang sekali.",
+      "Hai, saya [Nama Lengkap], panggil saja [Nama Panggilan]. Rumah saya di [Alamat]. Ayah saya [Nama Ayah], ibu saya [Nama Ibu]. Saya suka [Hobi] karena [Alasan]. Saya bercita-cita menjadi [Cita-cita]. Sehari-hari saya bangun, merapikan tempat tidur, mandi, sholat, sarapan, sekolah, lalu pulang. Saya merasa bahagia menceritakan ini.",
+      "Assalamualaikum, nama saya [Nama Lengkap], biasa dipanggil [Nama Panggilan]. Saya tinggal di [Alamat]. Nama ayah saya [Nama Ayah], nama ibu saya [Nama Ibu]. Hobi saya [Hobi], karena [Alasan]. Cita-cita saya [Cita-cita]. Setiap hari saya bangun, mandi, sholat, sarapan, pergi sekolah, belajar, dan pulang. Saya merasa senang.",
+      "Halo semuanya, nama saya [Nama Lengkap]. Panggilan saya [Nama Panggilan]. Saya tinggal di [Alamat]. Ayah saya bernama [Nama Ayah] dan ibu saya bernama [Nama Ibu]. Hobi saya [Hobi] karena [Alasan]. Cita-cita saya ingin jadi [Cita-cita]. Sehari-hari saya bangun, mandi, sholat, sarapan, berangkat sekolah, belajar, lalu pulang. Saya merasa gembira sekali.",
+      "Perkenalkan, nama saya [Nama Lengkap]. Teman-teman boleh memanggil saya [Nama Panggilan]. Saya tinggal di [Alamat]. Ayah saya [Nama Ayah], ibu saya [Nama Ibu]. Hobi saya adalah [Hobi], karena [Alasan]. Cita-cita saya adalah [Cita-cita]. Setiap hari saya bangun tidur, mandi, sholat, sarapan, pergi ke sekolah, dan pulang. Saya merasa senang.",
+      "Hai teman-teman, nama saya [Nama Lengkap], panggil saja [Nama Panggilan]. Saya tinggal di [Alamat]. Nama ayah saya [Nama Ayah] dan ibu saya [Nama Ibu]. Hobi saya [Hobi], karena [Alasan]. Cita-cita saya ingin jadi [Cita-cita]. Kegiatan saya setiap hari yaitu bangun tidur, mandi, sholat, sarapan, belajar di sekolah, lalu pulang. Saya merasa bahagia.",
+      "Selamat pagi, nama saya [Nama Lengkap]. Panggilan saya [Nama Panggilan]. Saya tinggal di [Alamat]. Ayah saya bernama [Nama Ayah], ibu saya bernama [Nama Ibu]. Hobi saya [Hobi] karena [Alasan]. Saya ingin menjadi [Cita-cita]. Rutinitas saya adalah bangun, merapikan tempat tidur, mandi, sholat, sarapan, sekolah, dan pulang. Saya merasa senang bisa berbagi cerita."
+    ];
+
+    const gradients = [
+      "linear-gradient(to right, #f472b6, #a855f7)", // pink-400 to purple-500
+      "linear-gradient(to right, #60a5fa, #06b6d4)", // blue-400 to cyan-500
+      "linear-gradient(to right, #4ade80, #059669)", // green-400 to emerald-500
+      "linear-gradient(to right, #facc15, #f97316)", // yellow-400 to orange-500
+      "linear-gradient(to right, #818cf8, #c084fc)", // indigo-400 to violet-500
+      "linear-gradient(to right, #f87171, #fb7185)", // red-400 to rose-500
+      "linear-gradient(to right, #2dd4bf, #10b981)", // teal-400 to green-500
+      "linear-gradient(to right, #fb923c, #f472b6)", // orange-400 to pink-500
+      "linear-gradient(to right, #22d3ee, #3b82f6)", // cyan-400 to blue-500
+      "linear-gradient(to right, #c084fc, #f472b6)"  // purple-400 to violet-500
+    ];
+
+    let biodata = {};
+
+    document.getElementById("bioForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+      const formData = new FormData(e.target);
+      biodata = Object.fromEntries(formData.entries());
+      renderTemplates();
+      const popup = document.getElementById("popup");
+      popup.classList.remove("hidden");
+      setTimeout(() => {
+        popup.classList.add("show");
+      }, 10);
+    });
+
+    function renderTemplates() {
+      const container = document.getElementById("templateContainer");
+      container.innerHTML = "";
+      templates.forEach((tpl, index) => {
+        let filled = tpl
+          .replace("[Nama Lengkap]", biodata.namaLengkap)
+          .replace("[Nama Panggilan]", biodata.namaPanggilan)
+          .replace("[Alamat]", biodata.alamat)
+          .replace("[Nama Ayah]", biodata.namaAyah)
+          .replace("[Nama Ibu]", biodata.namaIbu)
+          .replace("[Hobi]", biodata.hobi)
+          .replace("[Alasan]", biodata.alasan)
+          .replace("[Cita-cita]", biodata.citaCita);
+
+        const slide = document.createElement("div");
+        slide.className = "swiper-slide flex justify-center";
+        slide.innerHTML = `
+          <div class="max-w-md w-full transform transition hover:scale-105 rounded-2xl card-container">
+            <div class="card-header" style="--gradient: ${gradients[index]}">
+              ${biodata.namaPanggilan}
+            </div>
+            <hr class="card-divider" style="--gradient: ${gradients[index]}" />
+            <div class="card-body">
+              <p class="leading-relaxed">${filled}</p>
+            </div>
+          </div>
+        `;
+        container.appendChild(slide);
+      });
+
+      // Initialize Swiper with infinite loop
+      const swiper = new Swiper(".mySwiper", {
+        slidesPerView: 1,
+        spaceBetween: 30,
+        loop: true, // Enable infinite loop
+        navigation: { nextEl: ".swiper-button-next", prevEl: ".swiper-button-prev" },
+        pagination: { el: ".swiper-pagination", clickable: true },
+      });
+
+      // Attach event listener to the save button
+      document.querySelector(".save-btn").addEventListener("click", function() {
+        saveAsImage(this, swiper);
+      });
+    }
+
+    // Save as PNG with transparent background and custom filename
+    function saveAsImage(button, swiper) {
+      // Get the active slide's card
+      const activeSlide = document.querySelector(".swiper-slide-active .card-container");
+      if (!activeSlide) {
+        console.error("No active slide found");
+        return;
+      }
+      html2canvas(activeSlide, {
+        backgroundColor: null, // Set background to transparent
+        useCORS: true,
+        scale: 2, // Increase scale for better rendering quality
+      }).then(canvas => {
+        const link = document.createElement("a");
+        // Use namaPanggilan for the filename, sanitized to avoid invalid characters
+        const sanitizedNickname = biodata.namaPanggilan.replace(/[^a-zA-Z0-9]/g, "_").toLowerCase();
+        link.download = `${sanitizedNickname}_biodata.png`;
+        link.href = canvas.toDataURL("image/png");
+        link.click();
+      }).catch(error => {
+        console.error("Error saving image:", error);
+      });
+    }
+
+    // Close popup when clicking the background
+    document.getElementById("popup").addEventListener("click", function(e) {
+      if (e.target.id === "popup") {
+        this.classList.remove("show");
+        setTimeout(() => {
+          this.classList.add("hidden");
+        }, 500);
+      }
+    });
+  </script>
+</body>
+</html>
